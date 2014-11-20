@@ -22,10 +22,10 @@ module DailyProgrammer.Challenge118 where
 -- last 2 digits of the year. Years only go between 1950-2049.
 
 import Data.Time
-import Data.Time.Format
 import System.Locale
 import Text.Regex.Posix
 
+main118 :: IO ()
 main118 = do
         line <- getLine
         if null line
@@ -54,6 +54,7 @@ previousCentury :: UTCTime -> UTCTime
 previousCentury time = rdTime "%Y-%m-%d" ("19" ++ timeStr)
                        where timeStr = fmtTime "%y-%m-%d" time
 
+maxTime :: UTCTime
 maxTime = readTime defaultTimeLocale "%Y-%m-%d" "2050-01-01"
 
 fmtTime = formatTime defaultTimeLocale
