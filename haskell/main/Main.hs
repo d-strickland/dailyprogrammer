@@ -1,5 +1,5 @@
-module Main ( main ) where
+module Main (main) where
 import DailyProgrammer
 
 main :: IO ()
-main = main118
+main = main197
