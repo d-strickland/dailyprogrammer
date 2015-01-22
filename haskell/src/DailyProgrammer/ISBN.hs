@@ -1,7 +1,7 @@
 module DailyProgrammer.ISBN where
 
 import Data.Char (digitToInt, isDigit)
-import System.Environment
+import System.Environment (getArgs)
 import Text.Regex.Posix
 
 main197 :: IO()
@@ -9,7 +9,7 @@ main197 = do
     args <- getArgs
     if null args
         then putStrLn "Please provide an ISBN."
-        else (putStrLn . show . isValid . head) args
+        else putStrLn . show . isValid . head $ args
 
 isValid isbn = (isValidFormat isbn) && (11 `divides` checksum isbn)
                where divides m n = (n `rem` m) == 0
