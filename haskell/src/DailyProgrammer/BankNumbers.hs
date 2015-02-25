@@ -8,13 +8,13 @@ main = do
 
 banner :: String -> String
 banner = unlines . transpose . bannerT
-    where bannerT = foldl' acc []
-          xs `acc` x = xs ++ (transpose $ nums!!(digitToInt x))
+bannerT = foldl' acc []
+    where acc xs x = xs ++ (transpose $ nums!!(digitToInt x))
 
 fromBanner :: String -> Maybe [Int]
 fromBanner = sequence . fromBannerT . transpose . lines
 fromBannerT [] = []
-fromBannerT (x:y:z:xs) = (elemIndex (transpose $ [x,y,z]) nums) : (fromBannerT xs)
+fromBannerT (x:y:z:xs) = (elemIndex (transpose [x,y,z]) nums) : (fromBannerT xs)
 
 showFromBanner Nothing = "Bad banner."
 showFromBanner (Just ns) = map intToDigit ns
