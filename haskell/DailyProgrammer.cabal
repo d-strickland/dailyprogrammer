@@ -26,7 +26,7 @@ library
     exposed-modules:      DailyProgrammer
     other-modules:        DailyProgrammer.Challenge118,
                           DailyProgrammer.ISBN
-    build-depends:        base, regex-posix, old-locale, time
+    build-depends:        base, regex-posix, old-locale, time, RBTree
     ghc-options:          -Wall
                           -O2
 

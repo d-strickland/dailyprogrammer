@@ -1,7 +1,13 @@
 module DailyProgrammer.MetroTile where
 
-import Data.List (foldl')
-import Control.Monad.State
+import Data.Tree.RBTree (RBTree(Node, Leaf), insertOrd, deleteOrd, searchOrd, emptyRB)
+import Data.Maybe (fromJust, isNothing, isJust)
+import qualified Data.Foldable as F
+
+main = do
+    bounds <- getLine
+    chars <- getContents
+    return ()
 
 data Window = Window { title  :: Char
                      , xpos   :: Int
@@ -10,46 +16,32 @@ data Window = Window { title  :: Char
                      , height :: Int
                      } deriving (Show)
 
-mergableH (Window t1 x1 y1 w1 h1) (Window t2 x2 y2 w2 h2)
-    | t1 /= t2      = False
-    | y1 /= y2      = False
-    | h1 /= h2      = False
-    | x1 + w1 == x2 = True
-    | x2 + w2 == x1 = True
-    | otherwise     = False
+-- "Equal" windows have the same title and are overlapping or adjacent.
+-- Otherwise the windows are compared by their title, x position, or y position
+-- in that order.
+-- (<) and (>) are transitive, but EQUALITY IS NOT. This could lead to some
+-- weirdness, so we need to make sure that we don't insert two equal windows
+-- into a tree.
+instance Eq Window where v == w = (v <= w) && (w <= v)
+instance Ord Window where
+    Window t1 x1 y1 w1 h1 <= Window t2 x2 y2 w2 h2
+        | t1 < t2                           = True
+        | x1 < x2                           = True
+        | y1 < y2                           = True
+        | (x1 <= x2 + w2) && (y1 < y2 + h2) = True -- Equal (overlap or to right)
+        | (y1 <= y2 + h2) && (x1 < x2 + w2) = True -- Equal (overlap or below)
+        | otherwise                         = False
 
-mergableV (Window t1 x1 y1 w1 h1) (Window t2 x2 y2 w2 h2)
-    | t1 /= t2      = False
-    | x1 /= x2      = False
-    | w1 /= w2      = False
-    | y1 + h1 == y2 = True
-    | y2 + h2 == y1 = True
-    | otherwise     = False
+addPixel :: RBTree Window -> Window -> RBTree Window
+wins `addPixel` pix 
+    | isNothing existing = wins `insertOrd` pix
+    | isJust    existing = (wins `deleteOrd` (Window t x y w h)) `insertOrd`
+                           Window t x y (max w (xpos pix - x + 1))
+                                        (max h (ypos pix - y + 1))
+    where existing = wins `searchOrd` pix
+          Window t x y w h = fromJust existing
 
-merge v w
-    | mergableV v w = Window (title v) (xpos v) (min (ypos v) (ypos w)) (width v) (height v + height w)
-    | mergableH v w = Window (title v) (min (xpos v) (xpos w)) (ypos v) (width v + width w) (height v)
-    | otherwise = error "Merged windows must be adjacent, have the same title, and have the same width or height."
+instance F.Foldable RBTree where
+foldr f z Leaf = z
+foldr f z (Node _ v l r) = F.foldr f (f v (F.foldr f z r)) l
 
-
-pixels :: [Char] -> [(Int,Int)] -> [Window]
-pixels cs ixs = filter (\w -> (title w /= '.')) (zipWith makeWin cs ixs)
-    where makeWin c (x,y) = Window {title=c, xpos=x, ypos=y, width=1, height=1}
-
--- Combine a row of pixels horizontally where possible.
--- Return the resuling windows in reverse order by xpos.
-concatH :: [Window] -> [Window]
-concatH = foldl' acc []
-    where acc [] v = [v]
-          acc (w:ws) v | mergableH v w  = (merge v w):ws
-                       | otherwise      = v:w:ws
-
--- Combine two rows of pixels vertically where possible.
--- Return the resulting windows in ascending order by xpos.
-concatV :: [Window] -> [Window] -> [Window]
-concatV []     (w:ws) = w:ws
-concatV (v:vs) []     = v:vs
-concatV (v:vs) (w:ws) | xpos v >  xpos w = v:(concatV vs (w:ws))
-                      | xpos v <  xpos w = w:(concatV (v:vs) ws)
-                      | mergableV v w    = (merge v w):(concatV vs ws)
-                      | otherwise        = v:(concatV vs (w:ws))
