@@ -25,7 +25,8 @@ library
     default-language:     Haskell2010
     exposed-modules:      DailyProgrammer
     other-modules:        DailyProgrammer.Challenge118,
-                          DailyProgrammer.ISBN
+                          DailyProgrammer.ISBN,
+                          DailyProgrammer.MetroTile
     build-depends:        base, regex-posix, old-locale, time, RBTree
     ghc-options:          -Wall
                           -O2
