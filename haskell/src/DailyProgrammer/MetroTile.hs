@@ -26,12 +26,28 @@ data Window = Window { title  :: Char
 -- into the same tree.
 instance Eq Window where v == w = v `compare` w == EQ
 
--- FIXME: Pair ordering isn't doing what I thought.
+{-|
+FIXME: This is hella broken because some pixels in window v may be less than
+window w while some may be greater. In that situation the tree ordering is
+fucked and you end up with duplicate windows in the RBTree.
+Note to self: don't ever try to hack Ord like this again. I suspect it will
+always come back to bite.
+
+Solution approach n+1:
+======================
+Implement a legit window order and store the windows in a set. Sets are
+implemented with balanced binary search trees, so the Window order and
+performance should be preserved. I'll need to implement my own algorithm to
+search for a window containing a pixel. I'm not sure what that will look like,
+but I think it will have to be in linear time. Maybe use a zipper?
+-}
 instance Ord Window where
     Window t1 x1 y1 w1 h1 `compare` Window t2 x2 y2 w2 h2
-        | t1 == t2 && (x1,y1) <= (x2,y2) && (x2,y2) <= (x1+w1, y1+h1) = EQ
-        | t1 == t2 && (x2,y2) <= (x1,y1) && (x1,y1) <= (x2+w2, y2+h2) = EQ
-        | otherwise = (x1,y1) `compare` (x2,y2)
+        | (t1 == t2) && (x1 <= x2) && (x2 <= x1+w1) && (y1 <= y2) && (y2 <= y1+h1) = EQ
+        | (t1 == t2) && (x2 <= x1) && (x1 <= x2+w2) && (y2 <= y1) && (y1 <= y2+h2) = EQ
+        | y1 < y2 = LT
+        | x1 < x2 = LT
+        | otherwise = GT
 
 instance Show Window where
     show (Window t x y w h) = show w ++ 'x' : show h ++ " tile of character '"
