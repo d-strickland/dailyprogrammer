@@ -27,7 +27,7 @@ library
     other-modules:        DailyProgrammer.Challenge118,
                           DailyProgrammer.ISBN,
                           DailyProgrammer.MetroTile
-    build-depends:        base, regex-posix, old-locale, time, RBTree
+    build-depends:        base, regex-posix, old-locale, time, containers
     ghc-options:          -Wall
                           -O2
 

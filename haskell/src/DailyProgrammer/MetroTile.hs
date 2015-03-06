@@ -1,15 +1,15 @@
 module DailyProgrammer.MetroTile where
 
-import Data.Tree.RBTree (RBTree(Node, Leaf), insertOrd, deleteOrd, searchOrd, emptyRB)
-import Data.Maybe (fromJust, isNothing, isJust)
-import Data.Monoid (mempty, mappend)
+import Data.Monoid (mappend)
 import Data.List (foldl')
+import qualified Data.Foldable as F
+import qualified Data.Set as S
 
 main = do
     bounds <- getLine
     chars <- getContents
     let [xb, yb] = map read $ words bounds
-    mapM_ print . toList . foldl' addPixel emptyRB . pixels xb yb . concat . lines $ chars
+    F.mapM_ print . foldl' addPixel S.empty . pixels xb yb . concat . lines $ chars
 
 data Window = Window { title  :: Char
                      , xpos   :: Int
@@ -18,65 +18,50 @@ data Window = Window { title  :: Char
                      , height :: Int
                      }
 
--- "Equal" windows have the same title and are overlapping or adjacent.
--- Otherwise the windows are ordered by x position and y position in that order.
---
--- (<) and (>) are transitive, but EQUALITY IS NOT. This could lead to some
--- weirdness, so we need to make sure that we don't insert two equal windows
--- into the same tree.
-instance Eq Window where v == w = v `compare` w == EQ
+{- |Equal windows have the same title and position. We don't want to just derive
+    Eq here because we will depend on Set to replace an existing window with a
+    bigger one. -}
+instance Eq Window where
+    v == w = (title v == title w) && (xpos v == xpos w) && (ypos v == ypos w)
 
-{-|
-FIXME: This is hella broken because some pixels in window v may be less than
-window w while some may be greater. In that situation the tree ordering is
-fucked and you end up with duplicate windows in the RBTree.
-Note to self: don't ever try to hack Ord like this again. I suspect it will
-always come back to bite.
-
-Solution approach n+1:
-======================
-Implement a legit window order and store the windows in a set. Sets are
-implemented with balanced binary search trees, so the Window order and
-performance should be preserved. I'll need to implement my own algorithm to
-search for a window containing a pixel. I'm not sure what that will look like,
-but I think it will have to be in linear time. Maybe use a zipper?
--}
 instance Ord Window where
-    Window t1 x1 y1 w1 h1 `compare` Window t2 x2 y2 w2 h2
-        | (t1 == t2) && (x1 <= x2) && (x2 <= x1+w1) && (y1 <= y2) && (y2 <= y1+h1) = EQ
-        | (t1 == t2) && (x2 <= x1) && (x1 <= x2+w2) && (y2 <= y1) && (y1 <= y2+h2) = EQ
-        | y1 < y2 = LT
-        | x1 < x2 = LT
-        | otherwise = GT
+-- |Compare windows by x position, y position, and title in that order.
+    v `compare` w = (xpos v `compare` xpos w) `mappend`
+                    (ypos v `compare` ypos w) `mappend`
+                    (title v `compare` title w)
 
 instance Show Window where
     show (Window t x y w h) = show w ++ 'x' : show h ++ " tile of character '"
                               ++ t : "' located at (" ++ show x ++ ','
                               : show y ++ ")"
 
--- This shouldn't be necessary, but RBTree isn't an instance of Foldable
-toList Leaf = []
-toList (Node _ v l r) = toList l ++ v : toList r
-
--- Take an x-bound, y-bound, and list of characters and generate a list of
--- "pixels" represented by 1x1 windows.
+{- |Take an x-bound, y-bound, and a list of characters and generate a list of
+    "pixels" represented by 1x1 windows. -}
 pixels :: Int -> Int -> [Char] -> [Window]
 pixels xb yb chars = map mkPix . filter ((/='.') . first) $ zipWith triple chars positions
-    where positions      = [(x,y) | y <- [0..yb-1], x <- [0..xb-1]]
+    where positions      = [(x,y) | y <- [0..yb-1], x <- [0..xb-1]] -- [(0,0),...,(xb-1,yb-1)]
           triple a (b,c) = (a,b,c)
           first (x,_,_)  = x
           mkPix (c,x,y)  = Window {title=c, xpos=x, ypos=y, width=1, height=1}
 
--- Accumulation function for the RBTree of windows. Take a RBTree of Windows
--- and a pixel. Add the pixel to the RBTree by either expanding one of the
--- windows or adding a new window. The RBTree will keep everything balanced and
--- ordered.
-addPixel :: RBTree Window -> Window -> RBTree Window
-wins `addPixel` pix
-    | isNothing existing = wins `insertOrd` pix
-    | isJust    existing = (wins `deleteOrd` (Window t x y w h)) `insertOrd`
-                           Window t x y (max w (xpos pix - x + 1))
-                                        (max h (ypos pix - y + 1))
-    where existing = wins `searchOrd` pix
-          Window t x y w h = fromJust existing
+{- |Accumulation function for the Set of windows. Take a Set of Windows
+    and a pixel. Add the pixel to the Set by either expanding one of the
+    windows or adding a new window. Set is implemented with balanced binary
+    search trees, so that should keep the windows ordered. O(size wins) -}
+addPixel :: S.Set Window -> Window -> S.Set Window
+wins `addPixel` p | S.null adjWins = p `S.insert` wins
+                  | otherwise      = bigWin `S.insert` wins
+                  where adjWins = S.filter (`contains` p) wins
+                        bigWin  = (head $ S.toList adjWins) `merge` p
+
+Window t1 x1 y1 w1 h1 `contains` Window t2 x2 y2 _ _
+    | t1 /= t2 = False
+    | x2 < x1  = False
+    | y2 < y1  = False
+    | (x2 < x1 + w1) && (y2 <= y1 + h1) = True
+    | (y2 < y1 + h1) && (x2 <= x1 + w1) = True
+    | otherwise = False
+
+Window t1 x1 y1 w1 h1 `merge` Window t2 x2 y2 w2 h2
+    = Window t1 x1 y1 (max w1 (x2-x1+1)) (max h1 (y2-y1+1))
 
