@@ -50,9 +50,9 @@ toPixels xb yb chars = map mkPix . filter ((/='.') . char) $ zip3 chars xs ys
     search tree, so that should keep the windows ordered and keep insertion
     efficient. O(size wins) -}
 addPixel :: S.Set Window -> Window -> S.Set Window
-wins `addPixel` p | not $ S.null contWins = wins
-                  | not $ S.null adjWins  = bigWin `S.insert` wins
-                  | otherwise             = p `S.insert` wins
+wins `addPixel` p | (not . S.null) contWins = wins
+                  | (not . S.null) adjWins  = bigWin `S.insert` wins
+                  | otherwise               = p `S.insert` wins
                   where contWins = S.filter (`contains` p) wins
                         adjWins  = S.filter (`adjoins` p) wins
                         bigWin   = (head $ S.toList adjWins) `merge` p
