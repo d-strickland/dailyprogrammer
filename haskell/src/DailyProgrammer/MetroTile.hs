@@ -62,7 +62,6 @@ Window t1 x1 y1 w1 h1 `contains` Window t2 x2 y2 _ _
     | x2 < x1  = False
     | y2 < y1  = False
     | (x2 < x1 + w1) && (y2 < y1 + h1) = True
-    | (y2 < y1 + h1) && (x2 < x1 + w1) = True
     | otherwise = False
 
 Window t1 x1 y1 w1 h1 `adjoins` Window t2 x2 y2 _ _
