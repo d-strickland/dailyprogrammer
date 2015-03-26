@@ -26,9 +26,10 @@ library
     exposed-modules:      DailyProgrammer
     other-modules:        DailyProgrammer.Challenge118,
                           DailyProgrammer.ISBN,
-                          DailyProgrammer.MetroTile
+                          DailyProgrammer.MetroTile,
+                          DailyProgrammer.BinaryToASCII
     build-depends:        base, regex-posix, old-locale, time, set-monad,
-                          containers
+                          containers, split
     ghc-options:          -Wall
                           -O2
 
