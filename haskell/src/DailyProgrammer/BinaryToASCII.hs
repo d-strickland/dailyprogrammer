@@ -14,11 +14,12 @@ feel so inclined!) of the binary phrase
 
 import Data.Char (chr, digitToInt)
 import Data.List.Split (chunksOf)
+import System.Environment (getArgs)
 
 toBase10 = sum . zipWith (*) powers . map digitToInt
          where powers = map (2^) [7,6..0]
 
 toASCII = map (chr . toBase10) . chunksOf 8
 
-main = getContents >>= (putStrLn . toASCII . concat . lines)
+main = getArgs >>= (putStrLn . toASCII . concat)
 
