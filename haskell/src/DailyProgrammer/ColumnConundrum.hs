@@ -30,12 +30,24 @@ main = do
     let [n, w, s] = map read . words $ args
     mapM_ putStrLn . rows n w s $ text
 
-rows n w s = map (intercalate (take s . repeat $ ' ')) . easyWrap n w
+rows n w s = map (intercalate (take s . repeat $ ' ')) . wrap n . toughChunks w
 
-easyWrap :: Int -> Int -> String -> [[String]]
-easyWrap n w text = transpose . chunksOf height $ chunks
-    where chunks = chunksOf w . concat . lines $ text
-          height = (length chunks) `cdiv` n
+wrap n chunks = transpose . chunksOf height $ chunks
+    where height = (length chunks) `cdiv` n
+          x `cdiv` y = 1 + ((x - 1) `div` y) -- Ceiling division
 
-x `cdiv` y = 1 + ((x - 1) `div` y) -- Divide two Ints and round towards infinity
+easyChunks :: Int -> String -> [String]
+easyChunks w = chunksOf w . concat . lines
+
+toughChunks :: Int -> String -> [String]
+toughChunks width = accum [] . intercalate ["\n"] . map words . lines
+    where accum [] [] = []
+          accum cs [] = cs
+          accum [] (w:ws) = accum [w] ws
+          accum (c:cs) (w:ws)
+            | w == "\n" = (c ++ (take rmdr . repeat $ ' ')):(accum cs ws)
+            | rmdr - (length w) - 1 < 0
+                        = (c ++ (take rmdr . repeat $ ' ')):(accum cs (w:ws))
+            | otherwise = accum ((c ++ " " ++ w):cs) ws
+                where rmdr = width - (length c)
 
