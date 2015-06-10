@@ -27,9 +27,10 @@ library
     other-modules:        DailyProgrammer.Challenge118,
                           DailyProgrammer.ISBN,
                           DailyProgrammer.MetroTile,
-                          DailyProgrammer.BinaryToASCII
+                          DailyProgrammer.BinaryToASCII,
+                          DailyProgrammer.Chester
     build-depends:        base, regex-posix, old-locale, time, set-monad,
-                          containers, split
+                          containers, split, KdTree
     ghc-options:          -Wall
                           -O2
 
