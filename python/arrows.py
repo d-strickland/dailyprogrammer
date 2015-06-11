@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 from sys import stdin
 import networkx as nx
 
