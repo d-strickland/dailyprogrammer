@@ -21,5 +21,5 @@ printsteps (n, steps, result) = putStrLn $ (show n) ++ " gets palindromic after 
 
 main = do
         numbers <- getContents
-        mapM_ (printsteps . steps) $ map read . lines $ numbers
+        mapM_ (printsteps . steps . read) $ lines numbers
 
