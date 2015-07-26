@@ -5,7 +5,7 @@ cabal-dev
 *.chi
 *.chs.h
 *.pyc
-./python/animal_guess/data/*.pkl
+*.pkl
 .virtualenv
 .hsenv
 .cabal-sandbox/
