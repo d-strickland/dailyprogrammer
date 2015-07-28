@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 import unittest
 
-import animal_guess as ag
+import animal_guess_old as ag
 
 class AnimalGuessTestCase(unittest.TestCase):
     """Base class for animal guess unit tests."""
