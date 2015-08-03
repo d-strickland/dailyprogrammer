@@ -2,6 +2,43 @@
 from math import exp
 import pickle
 
+
+def main():
+    pass
+
+
+def ask(query):
+    """Take a query. Present it to the user and return the yes/no
+    response as a boolean.
+    """
+    response = input('{0} [y/n]: '.format(query))
+    if response.lower() == 'y':
+        return True
+    if response.lower() == 'n':
+        return False
+    # If the user didn't respond with 'y' or 'n', just ask the question again.
+    return ask(query)
+
+
+def guess(animal):
+    """Guess an animal. Return whether the guess was correct as a boolean, 
+    the actual animal from the user, and the new question from the user (or None).
+    """
+    a_or_an = 'a'
+    if animal.name[0] in 'aeiouAEIOU':
+        a_or_an = 'an'
+    if obj.ask('\nIs your animal {0} {1}?'.format(a_or_an, animal.name)):
+        print('\nHah, I knew it! I win this round!')
+        return True, animal, None
+
+    print('\nYou stumped me! Please help me learn.')
+    answer = input('What is the name of your animal? ')
+    question = input('Please enter a new question that answers "yes" for {0}: '
+                         .format(answer))
+    print('\nThank you for teaching me! I am studying hard for my Turing test!')
+    return False, Animal(animal, set([question]), set()), question
+
+
 class Animal(object):
     """An animal has a name and two sets of questions--one set answers "yes"
     and the other set answers "no." The name of the animal should be considered
@@ -39,4 +76,8 @@ class Animal(object):
 
     def __str__(self):
         return self.name
+
+
+if __name__ == '__main__':
+    main()
 

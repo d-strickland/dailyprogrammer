@@ -1,0 +1,49 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+ANIMAL_FILE	animal_guess_old.py	/^ANIMAL_FILE = 'data\/animals.pkl'$/;"	v
+ANIMAL_FILE	animals.py	/^ANIMAL_FILE = 'data\/animals.pkl'$/;"	v
+Animal	animalguess.py	/^class Animal(object):$/;"	c
+Parser	animal_guess_old.py	/^class Parser(object):$/;"	c
+QUESTION_FILE	animal_guess_old.py	/^QUESTION_FILE = 'data\/questions.pkl'$/;"	v
+QUESTION_FILE	animals.py	/^QUESTION_FILE = 'data\/questions.pkl'$/;"	v
+Question	animal_guess_old.py	/^class Question(object):$/;"	c
+QuestionIterator	animal_guess_old.py	/^class QuestionIterator(object):$/;"	c
+__delattr__	animalguess.py	/^    def __delattr__(self, attr_name):$/;"	m	class:Animal	file:
+__eq__	animal_guess_old.py	/^    def __eq__(self, other):$/;"	m	class:Question	file:
+__eq__	animalguess.py	/^    def __eq__(self, other):$/;"	m	class:Animal	file:
+__hash__	animal_guess_old.py	/^    def __hash__(self):$/;"	m	class:Question	file:
+__hash__	animalguess.py	/^    def __hash__(self):$/;"	m	class:Animal	file:
+__init__	animal_guess_old.py	/^    def __init__(self, question, yes_animals=set(), no_animals=set()):$/;"	m	class:Question
+__init__	animal_guess_old.py	/^    def __init__(self, questions, candidates, parser):$/;"	m	class:QuestionIterator
+__init__	animalguess.py	/^    def __init__(self, name, yes_questions=set(), no_questions=set()):$/;"	m	class:Animal
+__iter__	animal_guess_old.py	/^    def __iter__(self):$/;"	m	class:QuestionIterator	file:
+__key	animal_guess_old.py	/^    def __key(self):$/;"	m	class:Question	file:
+__next__	animal_guess_old.py	/^    def __next__(self):$/;"	m	class:QuestionIterator	file:
+__repr__	animalguess.py	/^    def __repr__(self):$/;"	m	class:Animal	file:
+__setattr__	animalguess.py	/^    def __setattr__(self, attr_name, attr_value):$/;"	m	class:Animal	file:
+__str__	animalguess.py	/^    def __str__(self):$/;"	m	class:Animal	file:
+animals	animals.py	/^animals = set()     # eg. {'moose', 'kangaroo', 'chicken', 'platypus'}$/;"	v
+animals	seed_questions.py	/^animals = {'moose', 'kangaroo', 'chicken', 'platypus'}$/;"	v
+ask	animal_guess_old.py	/^    def ask(obj, question):$/;"	m	class:Parser
+candidates	animals.py	/^candidates = set()$/;"	v
+first	animal_guess_old.py	/^def first(collection):$/;"	f
+guess	animal_guess_old.py	/^    def guess(obj, animal, yes_questions):$/;"	m	class:Parser
+guess	animals.py	/^def guess(animal, yes_questions):$/;"	f
+main	animal_guess_old.py	/^def main():$/;"	f
+main	animals.py	/^def main():$/;"	f
+next_question	animals.py	/^def next_question():$/;"	f
+play	animals.py	/^def play():$/;"	f
+polarization	animal_guess_old.py	/^    def polarization(self, q):$/;"	m	class:QuestionIterator
+polarization	animals.py	/^def polarization(q):$/;"	f
+prompt	animal_guess_old.py	/^    def prompt(obj, query):$/;"	m	class:Parser
+questions	animals.py	/^questions = dict()  # eg. {'Is your animal a mammal?': {'moose', 'kangaroo', 'platypus'},$/;"	v
+questions	seed_questions.py	/^questions = {$/;"	v
+setup	animal_guess_old.py	/^def setup():$/;"	f
+setup	animals.py	/^def setup():$/;"	f
+teardown	animal_guess_old.py	/^def teardown(animal, questions, candidates, yes_questions, no_questions):$/;"	f
+teardown	animals.py	/^def teardown(animal, yes_questions):$/;"	f
+yes	animals.py	/^def yes(prompt):$/;"	f
