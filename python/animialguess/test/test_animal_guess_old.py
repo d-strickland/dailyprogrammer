@@ -51,59 +51,6 @@ class MockParser(object):
         return self.answers.pop()
 
 
-class PolarizationTestCase(AnimalGuessTestCase):
-    """Tests for the polarization function."""
-
-    def setUp(self):
-        super().setUp()
-        self.candidates = self.mammals.union(self.non_mammals)
-
-    def testTooGeneral(self):
-        q = ag.Question("Is your animal an animal?", self.candidates, set())
-        qi = ag.QuestionIterator([q], self.candidates, MockParser([]))
-        self.assertEqual(0, qi.polarization(q))
-
-    def testTooSpecific(self):
-        q = ag.Question("Does your animal bury its head in the sand?", set(),
-                            self.candidates)
-        qi = ag.QuestionIterator([q], self.candidates, MockParser([]))
-        self.assertEqual(0, qi.polarization(q))
-
-    def testPerfect(self):
-        q = ag.Question("Is your animal a mammal?", self.mammals, self.non_mammals)
-        qi = ag.QuestionIterator([q], self.candidates, MockParser([]))
-        self.assertEqual(1.001, qi.polarization(q))
-
-    def testComparison1(self):
-        p = ag.Question("Huh?", {'pangolin', 'aardvark'}, {'cobra', 'paddlefish'})
-        q = ag.Question("Eh?", {'pangolin'}, {'cobra', 'paddlefish'})
-        qi = ag.QuestionIterator([p, q], self.candidates, MockParser([]))
-        p_index = qi.polarization(p)
-        q_index = qi.polarization(q)
-
-        self.assertGreater(1, p_index)
-        self.assertGreater(1, q_index)
-        self.assertLess(0, p_index)
-        self.assertLess(0, q_index)
-
-        self.assertGreater(p_index, q_index)
-
-    def testComparison2(self):
-        p = ag.Question("Huh?", {'pangolin', 'aardvark'},
-                                {'cobra', 'paddlefish', 'kangaroo rat'})
-        q = ag.Question("Eh?", {'pangolin', 'aardvark'}, {'cobra', 'paddlefish'})
-        qi = ag.QuestionIterator([p, q], self.candidates, MockParser([]))
-        p_index = qi.polarization(p)
-        q_index = qi.polarization(q)
-
-        self.assertGreater(1, p_index)
-        self.assertGreater(1, q_index)
-        self.assertLess(0, p_index)
-        self.assertLess(0, q_index)
-
-        self.assertGreater(p_index, q_index)
-
-
 class QuestionIteratorTestCase(AnimalGuessTestCase):
 
     def setUp(self):

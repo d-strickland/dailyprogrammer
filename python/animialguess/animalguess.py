@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+import itertools
 from math import exp
 import pickle
 
@@ -47,8 +48,8 @@ class Animal(object):
     """
     def __init__(self, name, yes_questions=set(), no_questions=set()):
         super().__setattr__('name', name)  # Avoid AttributeError below.
-        self.yes_questions = yes_questions
-        self.no_questions = no_questions
+        self.yes_questions = set(yes_questions)
+        self.no_questions = set(no_questions)
     
     def __eq__(self, other):
         return self.name == other.name
@@ -57,7 +58,8 @@ class Animal(object):
         return hash(self.name)
 
     # Protect against mutation of the name attribute. Of course this can be
-    # subverted with something like animal.__dict__['name'] = 'bear', but
+    # subverted with something pathological, like:
+    #    animal.__dict__['name'] = 'bear', but
     # this should catch any honest mistakes.
     def __setattr__(self, attr_name, attr_value):
         if attr_name == 'name':
@@ -77,6 +79,52 @@ class Animal(object):
     def __str__(self):
         return self.name
 
+
+class QuestionIterator(object):
+    """Iterate through the questions with the goal of narrowing down the list
+    of candidates to one as quickly as possible.
+    """
+
+    def __init__(self, questions, candidates, ask_func=ask):
+        self.questions = set(questions)
+        # Start all candidate animals out with a score of zero.
+        self.candidate_scores = dict(zip(candidates, itertools.repeat(0)))
+        self.ask_func = ask_func
+
+    def __iter__(self):
+        return self
+
+    def _yes_animals(self, question):
+        """Take a quesiton and return the animals that answer yes to that
+        question as a set.
+        """
+        fltr = lambda x: question in x.yes_questions
+        return set(filter(fltr, self.candidate_scores.keys()))
+
+    def _no_animals(self, question):
+        """Take a quesiton and return the animals that answer no to that
+        question as a set.
+        """
+        fltr = lambda x: question in x.no_questions
+        return set(filter(fltr, self.candidate_scores.keys()))
+
+    def _yes_polarization(self, question):
+        """Take a question and return an index of how well the question
+        partitions the set of animals, assuming the answer to the quesiton is
+        yes. The index will be greater than or equal to zero. Zero represents
+        a "worst possible" question, where either all of the candidate animals
+        answer yes or all of the candidate animals answer no. The higher the
+        index, the closer an answer of "yes" would come to splitting the
+        candidate set in half.
+        """
+        return 0
+
+    def _no_polarization(self, question):
+        """Take a question and return an index of how well the question
+        partitions the set of animals, assuming the answer to the quesiton is
+        yes. The "no" index follows all of the same rules as the "yes" index
+        """
+        return 0
 
 if __name__ == '__main__':
     main()

@@ -1,9 +1,10 @@
-#!/usr/bin/python3
+#1!/usr/bin/python3
+import itertools
 import unittest
 
 import animalguess as ag
 
-class AnimalTestCase(unittest.TestCase):
+class AGTestCase(unittest.TestCase):
     questions = [
         'Is your animal a mammal?',
         'Does your animal walk on four legs?',
@@ -11,9 +12,15 @@ class AnimalTestCase(unittest.TestCase):
         'Does your animal live in the ocean?'
     ]
 
-    mouse = ag.Animal('mouse', set(questions[:3]), set([questions[3]]))
-    bear = ag.Animal('bear', set(questions[:3]), set([questions[3]]))
-        
+    mouse = ag.Animal('mouse', questions[:3], [questions[3]])
+    bear = ag.Animal('bear', questions[:3], [questions[3]])
+    dolphin = ag.Animal('dolphin', [questions[0], questions[3]], questions[1:2])
+    moose = ag.Animal('moose', questions[0:1], questions[2:3])
+
+    animals = [mouse, bear, dolphin, moose]
+
+
+class AnimalTestCase(AGTestCase):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.assertEmpty = self.assertFalse
@@ -51,13 +58,48 @@ class AnimalTestCase(unittest.TestCase):
         with self.assertRaises(AttributeError):
             del self.mouse.name
 
-    def testRepr(self):
-        expected = "Animal('mouse', {0}, {1})".format(
-            repr(set(self.questions[:3])),
-            repr(set([self.questions[3]]))
-        )
-        self.assertEqual(expected, repr(self.mouse))
-
     def testStr(self):
         self.assertEqual('mouse', str(self.mouse))
+
+
+class QuestionIteratorTestCase(AGTestCase):
+    @classmethod
+    def setUpClass(cls):
+        mock_ask = lambda obj, prompt: True
+        cls.qi = ag.QuestionIterator(cls.questions, cls.animals, mock_ask)
+
+    def testInit(self):
+        animal_scores = dict(zip(self.animals, itertools.repeat(0)))
+        self.assertSetEqual(set(self.questions), self.qi.questions)
+        self.assertDictEqual(animal_scores, self.qi.candidate_scores)
+
+    def testYes(self):
+        self.assertSetEqual(set(self.animals), self.qi._yes_animals('Is your animal a mammal?'))
+        self.assertSetEqual(set([self.mouse, self.bear, self.moose]), self.qi._yes_animals('Does your animal have claws?'))
+
+    def testNo(self):
+        self.assertSetEqual(set(), self.qi._no_animals('Is your animal a mammal?'))
+        self.assertSetEqual(set([self.dolphin]), self.qi._no_animals('Does your animal have claws?'))
+
+    def testYesIndex(self):
+        """
+        """
+
+
+class PolarizationTestCase(QuestionIteratorTestCase):
+    """Tests for the polarization functions."""
+
+    def testTooGeneral(self):
+        q = 'Is your animal a mammal?'
+        self.assertEqual(0, self.qi._yes_polarization(q))
+
+    def testTooSpecific(self):
+        q = 'Is your animal a mammal?'
+        self.assertEqual(0, self.qi._no_polarization(q))
+
+    def testComparison1(self):
+        pass
+
+    def testComparison2(self):
+        pass
 
