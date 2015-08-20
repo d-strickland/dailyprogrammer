@@ -28,7 +28,8 @@ library
                           DailyProgrammer.ISBN,
                           DailyProgrammer.MetroTile,
                           DailyProgrammer.BinaryToASCII,
-                          DailyProgrammer.Chester
+                          DailyProgrammer.Chester,
+                          DailyProgrammer.Fraction
     build-depends:        base, regex-posix, old-locale, time, set-monad,
                           containers, split, KdTree
     ghc-options:          -Wall
