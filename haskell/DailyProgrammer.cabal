@@ -7,7 +7,7 @@ bug-reports:              https://github.com/d-strickland/dailyprogrammer/issues
 homepage:                 https://github.com/d-strickland/dailyprogrammer
 synopsis:                 David Strickland's solutions to /r/dailyprogrammer challenges
 build-type:               Simple
-cabal-version:            >=1.20
+cabal-version:            >=1.16
 tested-with:              GHC>=7.6.3
 
 source-repository head
@@ -41,4 +41,5 @@ test-suite dp-tests
     hs-source-dirs:       test, src
     main-is:              TestMain.hs
     build-depends:        base, HUnit, QuickCheck, tasty, tasty-hunit,
-                          tasty-quickcheck, regex-posix, old-locale, time
+                          tasty-quickcheck, regex-posix, old-locale, time,
+                          friday, friday-devil
