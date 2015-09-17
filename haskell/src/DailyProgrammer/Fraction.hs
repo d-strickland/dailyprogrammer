@@ -41,6 +41,5 @@ instance Num Fraction where
 
     negate (Fraction a b) = fraction (-a) b
 
-main = do
-    getLine
-    getContents >>= print . foldl' (+) 0 . map fromStr . lines 
+main = getLine >> getContents >>= print . foldl' (+) 0 . map fromStr . lines 
+
