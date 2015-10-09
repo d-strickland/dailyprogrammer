@@ -3,7 +3,7 @@ module DailyProgrammer.FixedPoint where
 import Data.List (iterate)
 
 fixedPoint :: Float -> Float -> (Float -> Float) -> Float
-fixedPoint start err f = fst . head . dropWhile ((> err) . snd) . iterate next $ (start, err + 1)
+fixedPoint start err f = fst . head . dropWhile ((>= err) . snd) . iterate next $ (start, err + 1)
     where next (n, e) = (f n, abs $ n - (f n))
 
 main = do
