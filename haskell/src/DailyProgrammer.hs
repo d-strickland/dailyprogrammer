@@ -2,4 +2,4 @@ module DailyProgrammer (
     main
 ) where
 
-import DailyProgrammer.Fraction
+import DailyProgrammer.EstimatePI
