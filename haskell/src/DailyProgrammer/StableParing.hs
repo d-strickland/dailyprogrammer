@@ -5,47 +5,65 @@ import Control.Monad.State
 import Data.Maybe (fromJust)
 import Data.List (elemIndex)
 
-data PairData = PairData { malePrefs       :: M.Map Char String
-                         , femalePrefs     :: M.Map Char String
-                         , availableMen    :: String
-                         , engagementScore :: M.Map Char Int
-                         , pairs           :: M.Map Char Char
-                         }
+newtype Man = Man Char
+    deriving (Eq, Ord, Read, Show)
+newtype Woman = Woman Char
+    deriving (Eq, Ord, Read, Show)
 
-stablePairing :: State PairData (M.Map Char Char)
+data PairData = PairData { malePrefs        :: M.Map Man [Woman]
+                         , femalePrefs      :: M.Map Woman [Man]
+                         , availableMen     :: [Man]
+                         , engagementScores :: M.Map Woman Int
+                         , pairs            :: M.Map Woman Man
+                         }
+    deriving (Show)
+
+stablePairing :: State PairData (M.Map Woman Man)
 stablePairing = do
     pd <- get
-    if null $ availableMen pd
-    then return $ pairs pd
-    else do
-        propose
-        stablePairing
+    if null $ availableMen pd then gets pairs
+    else propose >> stablePairing
 
 
 propose :: State PairData ()
 propose = do
-    pd <- get
     man <- popMan
-    let woman = head $ malePrefs pd M.! man
-        newScore = fromJust . elemIndex man $ femalePrefs pd M.! man
-    nextWoman man
-    when (newScore > engagementScore pd M.! man) $ do
-        modifyAvailableMen tail
-        setScore woman newScore
-        when (member man $ pairs pd) $ modifyAvailableMen
-        
+    woman <- popWoman man
+    currentScore <- getCurrentScore woman
+    newScore <- computeScore woman man
+    if newScore <= currentScore then pushMan man
+    else getPartner woman >>= maybe (return ()) pushMan >> pushPair woman man newScore
 
-nextWoman :: Char -> State PairData ()
-nextWoman man = modify $ \s -> s { malePrefs = M.adjust tail man $ malePrefs s }
 
-modifyAvailableMen :: (String -> String) -> State PairData ()
-modifyAvailableMen f = modify $ \s -> s { availableMen = f $ availableMen s }
+popMan :: State PairData Man
+popMan = do
+    men <- gets availableMen
+    modify $ \s -> s { availableMen = tail $ availableMen s }
+    return (head men)
 
-popMan :: State PairData (Char)
-popMan = modify $ \s -> s { availableMen = tail availableMen s } >>= return . head $ avaliableMen s
+popWoman :: Man -> State PairData Woman
+popWoman man = do
+    prefs <- gets malePrefs
+    let women = prefs M.! man
+    modify $ \s -> s { malePrefs = M.insert man (tail women) (malePrefs s) }
+    return (head women)
 
-setScore :: Char -> Int -> State PairData ()
-setScore woman score = modify $ \s -> s { engagementScore =
-                                M.insert woman score $ engagementScore s } 
+pushMan :: Man -> State PairData ()
+pushMan man = modify $ \s -> s { availableMen = man : availableMen s }
 
+getCurrentScore :: Woman -> State PairData Int
+getCurrentScore woman = liftM (M.! woman) (gets engagementScores)
+
+computeScore :: Woman -> Man -> State PairData Int
+computeScore woman man =
+    liftM (fromJust . elemIndex man . (M.! woman)) $ gets femalePrefs
+
+pushPair :: Woman -> Man -> Int -> State PairData ()
+pushPair woman man score = modify $ \s ->
+                s { pairs = M.insert woman man (pairs s)
+                  , engagementScores = M.insert woman score (engagementScores s)
+                  }
+
+getPartner :: Woman -> State PairData (Maybe Man)
+getPartner woman = liftM (M.lookup woman) $ gets pairs
 
