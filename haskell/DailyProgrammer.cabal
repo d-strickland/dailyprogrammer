@@ -34,11 +34,9 @@ library
                           DailyProgrammer.BinaryToASCII,
                           DailyProgrammer.Chester,
                           DailyProgrammer.Fraction,
-                          DailyProgrammer.EstimatePI,
-                          DailyProgrammer.StablePairing
+                          DailyProgrammer.StableParing
     build-depends:        base >= 4, base < 5, regex-posix, old-locale, time,
-                          set-monad, mtl, containers, split, KdTree, friday,
-                          friday-devil >= 0.1.1.0, vector
+                          set-monad, mtl, containers, split, KdTree, vector
     ghc-options:          -Wall
 
 test-suite dp-tests
